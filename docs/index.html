@@ -489,28 +489,28 @@
           <div class="chat-author">
             <span>🔴 Alex (Left Ear — 85/15 Panned)</span>
           </div>
-          Marcus! In my mock exam, Question 26 asked whether digital services or products come first. Why did I get marked wrong for picking 'products based on services'?
+          Marcus! Why does my web application crash under heavy traffic when database queries pile up? Shouldn't asynchronous code handle all requests automatically?
         </div>
 
         <div class="chat-bubble right">
           <div class="chat-author">
             <span>🔵 Marcus (Right Ear — 15/85 Panned)</span>
           </div>
-          Because services are always built on top of products! The product is your core engine; the service is how value is delivered to the customer.
+          Because asynchronous code only prevents blocking the event loop; it does not increase database connection limits! You need connection pooling and in-memory caching to absorb peak traffic spikes.
         </div>
 
         <div class="chat-bubble left">
           <div class="chat-author">
             <span>🔴 Alex (Left Ear — 85/15 Panned)</span>
           </div>
-          Got it! What about utility versus warranty? How do I lock down that pair?
+          Got it! What is the real architectural difference between an in-memory cache and a primary database?
         </div>
 
         <div class="chat-bubble right">
           <div class="chat-author">
             <span>🔵 Marcus (Right Ear — 15/85 Panned)</span>
           </div>
-          Utility is fit for PURPOSE (what it does). Warranty is fit for USE (availability, capacity, and security). Purpose versus performance!
+          A cache is volatile memory built for ultra-low latency; the primary database is persistent storage built for ACID consistency. Speed versus durability!
         </div>
       </div>
     </section>
@@ -575,11 +575,11 @@
     <section class="simulator-card" style="margin-bottom: 80px;">
       <div class="sim-title">⚡ Quick Start CLI Generator</div>
       <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 6px;">
-        Convert any textbook, audio lecture, or exam prep notes into a complete 8D ADHD study video:
+        Convert any textbook, audio lecture, or technical study notes into a complete 8D ADHD study video:
       </p>
 
       <div class="cli-box">
-        <code id="cliCommand">adhd-8d -i exam_weak_points.txt --bilateral -o study_video.mp4 --speed 1.20</code>
+        <code id="cliCommand">adhd-8d -i study_notes.txt --bilateral -o study_video.mp4 --speed 1.20</code>
         <button class="btn-copy" id="btnCopy">Copy Command</button>
       </div>
     </section>
