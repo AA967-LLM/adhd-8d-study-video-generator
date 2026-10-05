@@ -14,15 +14,17 @@ from .transcriber import transcribe_and_format_captions
 from .video_engine import render_study_video
 
 from .procedural import get_or_create_default_background
+from .document_ingest import extract_document_text, synthesize_text_to_speech
 
 def main():
     parser = argparse.ArgumentParser(
         prog="adhd-8d",
-        description="Convert ANY lecture or audio into an 8D audio and ADHD kinetic visual loop study experience."
+        description="Convert ANY lecture, audio, PDF, or text document into an 8D audio and ADHD kinetic visual loop study experience."
     )
-    parser.add_argument("-i", "--input", required=True, help="Input audio or video file (e.g. lecture.m4a, podcast.mp3, video.mp4)")
+    parser.add_argument("-i", "--input", required=True, help="Input media or document: audio (.m4a, .mp3), video (.mp4), PDF (.pdf), or text (.txt, .md)")
     parser.add_argument("-b", "--background", help="Path to background visual loop (.mp4). If omitted, an open-source procedural motion loop is used.")
     parser.add_argument("--procedural-style", choices=["fractal", "starfield"], default="fractal", help="Built-in procedural background style (default: fractal)")
+    parser.add_argument("--voice", default="en-US-ChristopherNeural", help="Voice for PDF/text speech synthesis (default: en-US-ChristopherNeural)")
     parser.add_argument("-o", "--output", help="Output path (.mp4 for full video, or .mp3/.m4a for audio only)")
     parser.add_argument("-t", "--title", default="ADHD High-Retention Study Session", help="Title banner overlay text")
     parser.add_argument("-s", "--speed", type=float, default=DEFAULT_SPEED, help=f"Cognitive acceleration speed multiplier (default: {DEFAULT_SPEED})")
@@ -44,6 +46,16 @@ def main():
 
     base_dir = os.path.dirname(input_file)
     stem = os.path.splitext(os.path.basename(input_file))[0]
+    temp_tts_audio = None
+
+    # Detect PDF or Text document input
+    ext = os.path.splitext(input_file)[1].lower()
+    if ext in [".pdf", ".txt", ".md"]:
+        print(f"[*] Detected document input ({ext}): {input_file}")
+        text = extract_document_text(input_file)
+        temp_tts_audio = os.path.join(base_dir, f"{stem}_synthesized.mp3")
+        synthesize_text_to_speech(text, temp_tts_audio, voice=args.voice)
+        input_file = temp_tts_audio
 
     # Audio-only mode
     if args.audio_only or (args.output and args.output.lower().endswith((".mp3", ".wav", ".m4a"))):
@@ -114,6 +126,11 @@ def main():
         if os.path.exists(temp_8d_audio):
             try:
                 os.remove(temp_8d_audio)
+            except Exception:
+                pass
+        if temp_tts_audio and os.path.exists(temp_tts_audio):
+            try:
+                os.remove(temp_tts_audio)
             except Exception:
                 pass
 

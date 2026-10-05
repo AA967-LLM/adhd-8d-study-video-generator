@@ -100,12 +100,26 @@ adhd-8d \
   --preset mobile_9_16
 ```
 
-### D. Available Options
+### D. Convert PDFs or Written Tutorials into 8D Study Videos
+Extract structured text, parse tables into spoken narratives, synthesize spoken neural narration, and output complete 8D audio and video loops:
+```bash
+# Convert a PDF article or book chapter (auto-extracts headings, paragraphs, and tables)
+adhd-8d -i document.pdf -o study_session.mp4 --title "Distributed Systems Deep Dive"
+
+# Convert a markdown or text tutorial with a custom neural voice
+adhd-8d -i tutorial.md -o tutorial_8D.mp4 --voice en-US-ChristopherNeural
+
+# Ingest complex multi-column documents or invoices (runs 100% locally and offline)
+adhd-8d -i invoice_with_tables.pdf -o financial_breakdown.mp4
+```
+
+### E. Available Options
 | Argument | Flag | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `--input` | `-i` | *Required* | Path to input audio or video file |
+| `--input` | `-i` | *Required* | Path to input audio (`.mp3`, `.m4a`), video (`.mp4`), PDF (`.pdf`), or text (`.md`, `.txt`) |
 | `--background` | `-b` | Built-in | Path to custom background video (`.mp4`). If omitted, uses built-in open-source procedural loop |
 | `--procedural-style` | | `fractal` | Built-in procedural background (`fractal` or `starfield`) |
+| `--voice` | | `en-US-ChristopherNeural` | Neural voice model for PDF/text speech synthesis |
 | `--output` | `-o` | Auto | Destination path (`.mp4`, `.mp3`, `.m4a`) |
 | `--title` | `-t` | "Study Session" | Title overlay banner text |
 | `--speed` | `-s` | `1.20` | Audio pacing multiplier (1.0x to 1.5x) |
