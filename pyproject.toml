@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adhd-8d"
+version = "1.0.0"
+authors = [
+  { name="Adeel Ahmad", email="adeelahmad967@gmail.com" },
+]
+description = "Transforms any educational lecture or podcast into an 8D audio and kinetic visual loop study experience optimized for ADHD cognitive retention."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Multimedia :: Video :: Conversion",
+    "Topic :: Multimedia :: Sound/Audio :: Conversion",
+    "Topic :: Education",
+]
+dependencies = [
+    "faster-whisper>=1.0.0",
+    "numpy>=1.20.0",
+    "torch>=2.0.0"
+]
+
+[project.scripts]
+adhd-8d = "adhd_8d.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
