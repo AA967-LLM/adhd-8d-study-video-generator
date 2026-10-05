@@ -13,13 +13,16 @@ from .audio_engine import process_8d_audio
 from .transcriber import transcribe_and_format_captions
 from .video_engine import render_study_video
 
+from .procedural import get_or_create_default_background
+
 def main():
     parser = argparse.ArgumentParser(
         prog="adhd-8d",
         description="Convert ANY lecture or audio into an 8D audio and ADHD kinetic visual loop study experience."
     )
     parser.add_argument("-i", "--input", required=True, help="Input audio or video file (e.g. lecture.m4a, podcast.mp3, video.mp4)")
-    parser.add_argument("-b", "--background", help="Path to background visual loop (e.g. motion_loop.mp4, ambient_flow.mp4)")
+    parser.add_argument("-b", "--background", help="Path to background visual loop (.mp4). If omitted, an open-source procedural motion loop is used.")
+    parser.add_argument("--procedural-style", choices=["fractal", "starfield"], default="fractal", help="Built-in procedural background style (default: fractal)")
     parser.add_argument("-o", "--output", help="Output path (.mp4 for full video, or .mp3/.m4a for audio only)")
     parser.add_argument("-t", "--title", default="ADHD High-Retention Study Session", help="Title banner overlay text")
     parser.add_argument("-s", "--speed", type=float, default=DEFAULT_SPEED, help=f"Cognitive acceleration speed multiplier (default: {DEFAULT_SPEED})")
@@ -56,15 +59,15 @@ def main():
         print(f"\n[+] SUCCESS! 8D Audio file ready at: {out_audio}")
         return
 
-    # Full Video Mode requires background video
+    # Full Video Mode: If background not specified, use built-in procedural loop
     if not args.background:
-        print("[-] Error: Background video is required for video mode. Use -b / --background or run with --audio-only.", file=sys.stderr)
-        sys.exit(1)
-
-    bg_video = os.path.abspath(args.background)
-    if not os.path.exists(bg_video):
-        print(f"[-] Error: Background video not found: {bg_video}", file=sys.stderr)
-        sys.exit(1)
+        print("[*] No background video provided. Using built-in open-source procedural motion loop...")
+        bg_video = get_or_create_default_background(preset_name=args.preset, style=args.procedural_style)
+    else:
+        bg_video = os.path.abspath(args.background)
+        if not os.path.exists(bg_video):
+            print(f"[-] Error: Background video not found: {bg_video}", file=sys.stderr)
+            sys.exit(1)
 
     out_video = os.path.abspath(args.output) if args.output else os.path.join(base_dir, f"{stem}_8D_ADHD.mp4")
     temp_8d_audio = os.path.join(base_dir, f"{stem}_temp_8d.m4a")

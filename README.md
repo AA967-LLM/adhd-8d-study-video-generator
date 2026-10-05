@@ -78,23 +78,34 @@ Turn any lecture or podcast into an 8D headphone experience:
 adhd-8d -i lecture.m4a -o lecture_8D.mp3 --speed 1.20
 ```
 
-### B. Generate Full ADHD Study Video Loop
-Pair your audio with a background motion loop and burn center-screen kinetic captions:
+### B. Generate Full ADHD Study Video (Zero External Files Needed)
+Automatically uses the built-in **100% open-source procedural motion loop** (infinite Mandelbrot fractal zoom or 3D starfield warp) with zero external video dependencies:
 ```bash
 adhd-8d \
   -i lecture.m4a \
-  -b motion_loop.mp4 \
   -o study_session.mp4 \
   --title "Distributed Systems: Architectural Deep Dive" \
+  --procedural-style fractal
+```
+
+### C. Use a Custom Background Motion Loop
+You can also supply your own custom background video loop:
+```bash
+adhd-8d \
+  -i lecture.m4a \
+  -b my_motion_loop.mp4 \
+  -o study_session.mp4 \
+  --title "Advanced Algorithms Deep Dive" \
   --speed 1.20 \
   --preset mobile_9_16
 ```
 
-### C. Available Options
+### D. Available Options
 | Argument | Flag | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--input` | `-i` | *Required* | Path to input audio or video file |
-| `--background` | `-b` | None | Path to background motion video (`.mp4`) |
+| `--background` | `-b` | Built-in | Path to custom background video (`.mp4`). If omitted, uses built-in open-source procedural loop |
+| `--procedural-style` | | `fractal` | Built-in procedural background (`fractal` or `starfield`) |
 | `--output` | `-o` | Auto | Destination path (`.mp4`, `.mp3`, `.m4a`) |
 | `--title` | `-t` | "Study Session" | Title overlay banner text |
 | `--speed` | `-s` | `1.20` | Audio pacing multiplier (1.0x to 1.5x) |

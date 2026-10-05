@@ -10,7 +10,7 @@ import os
 import sys
 import subprocess
 from datetime import timedelta
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 import numpy as np
 
 # Load PyTorch CUDA DLLs on Windows
