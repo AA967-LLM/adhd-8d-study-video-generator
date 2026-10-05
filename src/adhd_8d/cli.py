@@ -9,12 +9,13 @@ import os
 import sys
 import argparse
 from .config import PRESETS, DEFAULT_SPEED, DEFAULT_8D_FREQ_HZ, DEFAULT_8D_AMOUNT
-from .audio_engine import process_8d_audio
+from .audio_engine import process_8d_audio, get_audio_duration
 from .transcriber import transcribe_and_format_captions
 from .video_engine import render_study_video
 
 from .procedural import get_or_create_default_background
 from .document_ingest import extract_document_text, synthesize_text_to_speech
+from .dialogue_engine import synthesize_bilateral_dialogue
 
 def main():
     parser = argparse.ArgumentParser(
@@ -24,7 +25,10 @@ def main():
     parser.add_argument("-i", "--input", required=True, help="Input media or document: audio (.m4a, .mp3), video (.mp4), PDF (.pdf), or text (.txt, .md)")
     parser.add_argument("-b", "--background", help="Path to background visual loop (.mp4). If omitted, an open-source procedural motion loop is used.")
     parser.add_argument("--procedural-style", choices=["fractal", "starfield"], default="fractal", help="Built-in procedural background style (default: fractal)")
-    parser.add_argument("--voice", default="en-US-ChristopherNeural", help="Voice for PDF/text speech synthesis (default: en-US-ChristopherNeural)")
+    parser.add_argument("--voice", default="en-US-ChristopherNeural", help="Voice for single-speaker PDF/text speech synthesis (default: en-US-ChristopherNeural)")
+    parser.add_argument("--bilateral", action="store_true", help="Enable dual-speaker alternating bilateral 8D audio (Left Ear: Alex, Right Ear: Marcus)")
+    parser.add_argument("--speaker1", default="en-US-AriaNeural", help="Speaker 1 voice (Left Ear) (default: en-US-AriaNeural)")
+    parser.add_argument("--speaker2", default="en-GB-RyanNeural", help="Speaker 2 voice (Right Ear) (default: en-GB-RyanNeural)")
     parser.add_argument("-o", "--output", help="Output path (.mp4 for full video, or .mp3/.m4a for audio only)")
     parser.add_argument("-t", "--title", default="ADHD High-Retention Study Session", help="Title banner overlay text")
     parser.add_argument("-s", "--speed", type=float, default=DEFAULT_SPEED, help=f"Cognitive acceleration speed multiplier (default: {DEFAULT_SPEED})")
@@ -47,27 +51,48 @@ def main():
     base_dir = os.path.dirname(input_file)
     stem = os.path.splitext(os.path.basename(input_file))[0]
     temp_tts_audio = None
+    already_8d = False
 
     # Detect PDF or Text document input
     ext = os.path.splitext(input_file)[1].lower()
     if ext in [".pdf", ".txt", ".md"]:
         print(f"[*] Detected document input ({ext}): {input_file}")
         text = extract_document_text(input_file)
-        temp_tts_audio = os.path.join(base_dir, f"{stem}_synthesized.mp3")
-        synthesize_text_to_speech(text, temp_tts_audio, voice=args.voice)
-        input_file = temp_tts_audio
+        has_dialogue = any(k in text.lower() for k in ["alex:", "marcus:", "speaker 1:", "speaker 2:", "q:", "a:"])
+        if args.bilateral or has_dialogue:
+            print("[*] Running Dual-Speaker Bilateral 8D Dialogue Engine...")
+            temp_tts_audio = os.path.join(base_dir, f"{stem}_bilateral_8d.m4a")
+            synthesize_bilateral_dialogue(
+                script_text=text,
+                output_path=temp_tts_audio,
+                speed=args.speed,
+                speaker1_voice=args.speaker1,
+                speaker2_voice=args.speaker2,
+                freq_hz=args.freq,
+                amount=args.amount
+            )
+            input_file = temp_tts_audio
+            already_8d = True
+        else:
+            temp_tts_audio = os.path.join(base_dir, f"{stem}_synthesized.mp3")
+            synthesize_text_to_speech(text, temp_tts_audio, voice=args.voice)
+            input_file = temp_tts_audio
 
     # Audio-only mode
     if args.audio_only or (args.output and args.output.lower().endswith((".mp3", ".wav", ".m4a"))):
         out_audio = os.path.abspath(args.output) if args.output else os.path.join(base_dir, f"{stem}_8D.mp3")
-        process_8d_audio(
-            input_path=input_file,
-            output_path=out_audio,
-            speed=args.speed,
-            freq_hz=args.freq,
-            amount=args.amount,
-            strip_silence=args.strip_silence
-        )
+        if already_8d:
+            import shutil
+            shutil.copyfile(input_file, out_audio)
+        else:
+            process_8d_audio(
+                input_path=input_file,
+                output_path=out_audio,
+                speed=args.speed,
+                freq_hz=args.freq,
+                amount=args.amount,
+                strip_silence=args.strip_silence
+            )
         print(f"\n[+] SUCCESS! 8D Audio file ready at: {out_audio}")
         return
 
@@ -88,14 +113,18 @@ def main():
 
     try:
         # Step 1: 8D Audio
-        duration = process_8d_audio(
-            input_path=input_file,
-            output_path=temp_8d_audio,
-            speed=args.speed,
-            freq_hz=args.freq,
-            amount=args.amount,
-            strip_silence=args.strip_silence
-        )
+        if already_8d:
+            temp_8d_audio = input_file
+            duration = get_audio_duration(temp_8d_audio)
+        else:
+            duration = process_8d_audio(
+                input_path=input_file,
+                output_path=temp_8d_audio,
+                speed=args.speed,
+                freq_hz=args.freq,
+                amount=args.amount,
+                strip_silence=args.strip_silence
+            )
 
         # Step 2: GPU Captions
         transcribe_and_format_captions(

@@ -4,6 +4,7 @@
 [![Python: 3.9+](https://img.shields.io/badge/Python-3.9+-green.svg)](https://python.org)
 [![GPU Acceleration](https://img.shields.io/badge/Hardware-GPU%20Accelerated-76B900.svg)](https://github.com/AA967-LLM/adhd-8d-study-video-generator)
 [![Open Source](https://img.shields.io/badge/Open%20Source-Heart-red.svg)](https://github.com/AA967-LLM/adhd-8d-study-video-generator)
+[![Live Web Showcase](https://img.shields.io/badge/Live%20Web%20Showcase-Interactive%20Demo-00E5FF.svg)](https://aa967-llm.github.io/adhd-8d-study-video-generator/)
 
 > **Convert ANY lecture, audiobook, tutorial, or podcast into a high-retention 8D audio and kinetic visual loop study experience.**  
 > Built for neurodivergent minds, ADHD learners, and anyone struggling with mid-sentence mental drifting and academic fatigue.
@@ -113,13 +114,26 @@ adhd-8d -i tutorial.md -o tutorial_8D.mp4 --voice en-US-ChristopherNeural
 adhd-8d -i invoice_with_tables.pdf -o financial_breakdown.mp4
 ```
 
-### E. Available Options
+### E. Dual-Speaker Bilateral 8D Dialogue (Alex in Left Ear & Marcus in Right Ear)
+When audio bounces between opposite cerebral hemispheres, it commands continuous attention and prevents daydreaming:
+```bash
+# Process an alternating Q&A or dialogue script:
+adhd-8d -i dialogue.txt --bilateral -o study_video.mp4 --amount 0.98
+
+# Customize speaker voices:
+adhd-8d -i questions.md --bilateral --speaker1 en-US-AriaNeural --speaker2 en-GB-RyanNeural
+```
+
+### F. Available Options
 | Argument | Flag | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--input` | `-i` | *Required* | Path to input audio (`.mp3`, `.m4a`), video (`.mp4`), PDF (`.pdf`), or text (`.md`, `.txt`) |
 | `--background` | `-b` | Built-in | Path to custom background video (`.mp4`). If omitted, uses built-in open-source procedural loop |
 | `--procedural-style` | | `fractal` | Built-in procedural background (`fractal` or `starfield`) |
-| `--voice` | | `en-US-ChristopherNeural` | Neural voice model for PDF/text speech synthesis |
+| `--voice` | | `en-US-ChristopherNeural` | Voice for single-speaker PDF/text speech synthesis |
+| `--bilateral` | | False | Enable dual-speaker alternating bilateral 8D audio (Left Ear: Alex, Right Ear: Marcus) |
+| `--speaker1` | | `en-US-AriaNeural` | Speaker 1 voice (Left Ear — 85/15 panned) |
+| `--speaker2` | | `en-GB-RyanNeural` | Speaker 2 voice (Right Ear — 15/85 panned) |
 | `--output` | `-o` | Auto | Destination path (`.mp4`, `.mp3`, `.m4a`) |
 | `--title` | `-t` | "Study Session" | Title overlay banner text |
 | `--speed` | `-s` | `1.20` | Audio pacing multiplier (1.0x to 1.5x) |
